@@ -1,16 +1,17 @@
-import smtplib
-import yfinance as yf
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+import os
+import re
 from datetime import date
-import re # Regular Expression modülünü ekledik
+import yfinance as yf
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 # --- AYARLAR ---
-GMAIL_KULLANICI_ADI = "furkanbalkac@gmail.com"
-GMAIL_UYGULAMA_SIFRESI = "jmphvozsyteiyirk"
-ALICI_EMAILLERI = ["furkanbalkac@gmail.com"]
+# Bu değerler artık GitHub Actions ortam değişkenlerinden ve Secrets'tan okunuyor
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+GONDERICI_EMAIL = os.environ.get('GMAIL_KULLANICI_ADI') # Bu, SendGrid'de doğruladığınız adres olmalı
+ALICI_EMAILLERI = ["furkanbalkac@gmail.com"] # Raporu alacak e-posta adresleri
 TICKERS = {
-    "Altın (Ons/USD)": "GC=F",
+    "Altın Vadeli (Ons/USD)": "GC=F",
     "Nasdaq 100 ETF (QQQ)": "QQQ",
     "S&P 500 ETF (IVV)": "IVV",
     "Dolar/TL": "USDTRY=X",
@@ -64,23 +65,21 @@ def veri_cek():
     return {k: v for k, v in cekilen_veriler.items() if v is not None}
 
 def email_html_olustur(veriler):
-    """HTML şablonunu okur, satır şablonunu kullanarak verileri işler ve nihai HTML'i oluşturur."""
+    """HTML şablonunu okur ve verilerle doldurur."""
     print("HTML e-posta içeriği oluşturuluyor...")
     try:
         with open(SABLON_DOSYASI, 'r', encoding='utf-8') as f:
             sablon_icerigi = f.read()
     except FileNotFoundError:
-        print(f"HATA: '{SABLON_DOSYASI}' bulunamadı! Lütfen dosyanın doğru yerde olduğundan emin olun.")
+        print(f"HATA: '{SABLON_DOSYASI}' bulunamadı!")
         return None
 
-    # 1. Satır şablonunu HTML'den çıkar
-    match = re.search(r'<!-- SATIR_SABLONU_BASLANGIC -->(.*?)<!-- SATIR_SABLONU_BITIS -->', sablon_icerigi, re.DOTALL)
+    match = re.search(r'(.*?)', sablon_icerigi, re.DOTALL)
     if not match:
-        print(f"HATA: '{SABLON_DOSYASI}' içinde satır şablonu bulunamadı. Lütfen <!-- SATIR_SABLONU_BASLANGIC --> yorumlarını kontrol edin.")
+        print(f"HATA: '{SABLON_DOSYASI}' içinde satır şablonu bulunamadı.")
         return None
     row_template = match.group(1).strip()
 
-    # 2. Verileri kullanarak satırları oluştur
     data_rows = ""
     for isim, veri in veriler.items():
         renk = '#475569'
@@ -89,59 +88,38 @@ def email_html_olustur(veriler):
         ikon = '&#9650;' if veri['yon'] == 'up' else '&#9660;' if veri['yon'] == 'down' else ''
         birim = veri.get('birim', '')
         
-        # Satır şablonunu doldur
-        new_row = row_template
-        new_row = new_row.replace('{{ISIM}}', isim)
-        new_row = new_row.replace('{{FIYAT}}', veri['fiyat'])
-        new_row = new_row.replace('{{BIRIM}}', birim)
-        new_row = new_row.replace('{{RENK}}', renk)
-        new_row = new_row.replace('{{IKON}}', ikon)
-        new_row = new_row.replace('{{DEGISIM}}', veri['degisim'])
-        new_row = new_row.replace('{{YUZDE_DEGISIM}}', veri['yuzde_degisim'])
-        
+        new_row = row_template.replace('{{ISIM}}', isim).replace('{{FIYAT}}', veri['fiyat']).replace('{{BIRIM}}', birim).replace('{{RENK}}', renk).replace('{{IKON}}', ikon).replace('{{DEGISIM}}', veri['degisim']).replace('{{YUZDE_DEGISIM}}', veri['yuzde_degisim'])
         data_rows += new_row
 
-    # 3. Ana şablondaki dummy verileri gerçek verilerle değiştir
-    final_html = re.sub(
-        r'<!-- VERI_SATIRLARI_BASLANGIC -->(.|\n)*?<!-- VERI_SATIRLARI_BITIS -->',
-        data_rows,
-        sablon_icerigi
-    )
-
-    # 4. Ana şablondaki tarih yer tutucusunu değiştir
+    final_html = re.sub(r'(.|\n)*?', data_rows, sablon_icerigi)
     final_html = final_html.replace('{{TARIH}}', date.today().strftime('%d %B %Y'))
+    final_html = re.sub(r'(.|\n)*?', '', final_html)
     
-    # 5. Şablon bloğunu nihai HTML'den temizle
-    final_html = re.sub(
-        r'<!-- SABLON_ALANI_BASLANGIC -->(.|\n)*?<!-- SABLON_ALANI_BITIS -->',
-        '',
-        final_html
-    )
-
     print("✓ HTML içeriği oluşturuldu.")
     return final_html
 
 def email_gonder(html_icerik):
-    """Hazırlanan HTML içeriğini e-posta olarak gönderir."""
+    """Hazırlanan HTML içeriğini SendGrid kullanarak e-posta olarak gönderir."""
     if not html_icerik:
         print("HTML içerik boş, gönderme işlemi iptal edildi.")
         return
+    if not SENDGRID_API_KEY or not GONDERICI_EMAIL:
+        print("HATA: SENDGRID_API_KEY veya GONDERICI_EMAIL ortam değişkenleri ayarlanmamış.")
+        return
 
-    print("E-posta gönderme işlemi başlatılıyor...")
+    print("E-posta gönderme işlemi SendGrid ile başlatılıyor...")
+    message = Mail(
+        from_email=GONDERICI_EMAIL,
+        to_emails=ALICI_EMAILLERI,
+        subject=f"Günlük Finans Piyasası Raporu - {date.today().strftime('%d.%m.%Y')}",
+        html_content=html_icerik
+    )
     try:
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = f"Günlük Finans Piyasası Raporu - {date.today().strftime('%d.%m.%Y')}"
-        msg['From'] = GMAIL_KULLANICI_ADI
-        msg['To'] = ", ".join(ALICI_EMAILLERI)
-        part2 = MIMEText(html_icerik, 'html', 'utf-8')
-        msg.attach(part2)
-        with smtplib.SMTP('smtp.gmail.com', 587) as server:
-            server.starttls()
-            server.login(GMAIL_KULLANICI_ADI, GMAIL_UYGULAMA_SIFRESI)
-            server.sendmail(GMAIL_KULLANICI_ADI, ALICI_EMAILLERI, msg.as_string())
-        print(f"✓ E-posta başarıyla gönderildi: {', '.join(ALICI_EMAILLERI)}")
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
+        response = sg.send(message)
+        print(f"✓ E-posta başarıyla gönderildi! Durum Kodu: {response.status_code}")
     except Exception as e:
-        print(f"✗ E-posta gönderilirken bir hata oluştu: {e}")
+        print(f"✗ SendGrid ile e-posta gönderilirken bir hata oluştu: {e}")
 
 # --- ANA ÇALIŞMA BLOKU ---
 if __name__ == '__main__':

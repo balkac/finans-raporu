@@ -3,7 +3,7 @@ name: Gunluk Finans Raporu Gonder
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 5 * * *'
+    - cron: '35 12 * * *'
 
 jobs:
   build:

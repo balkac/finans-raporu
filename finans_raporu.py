@@ -8,7 +8,7 @@ from sendgrid.helpers.mail import Mail
 # --- AYARLAR ---
 # Bu değerler artık GitHub Actions ortam değişkenlerinden ve Secrets'tan okunuyor
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
-GONDERICI_EMAIL = os.environ.get('GMAIL_KULLANICI_ADI') # Bu, SendGrid'de doğruladığınız adres olmalı
+GONDERICI_EMAIL = "furkanbalkac@gmail.com" # Bu, SendGrid'de doğruladığınız adres olmalı
 ALICI_EMAILLERI = ["furkanbalkac@gmail.com"] # Raporu alacak e-posta adresleri
 TICKERS = {
     "Altın Vadeli (Ons/USD)": "GC=F",

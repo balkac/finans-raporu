@@ -7,7 +7,7 @@ import re # Regular Expression modülünü ekledik
 
 # --- AYARLAR ---
 GMAIL_KULLANICI_ADI = "furkanbalkac@gmail.com"
-GMAIL_UYGULAMA_SIFRESI = "jfjbmpmqusmdxehj"
+GMAIL_UYGULAMA_SIFRESI = "jmphvozsyteiyirk"
 ALICI_EMAILLERI = ["furkanbalkac@gmail.com"]
 TICKERS = {
     "Altın (Ons/USD)": "GC=F",

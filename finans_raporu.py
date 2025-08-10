@@ -9,7 +9,7 @@ from sendgrid.helpers.mail import Mail
 # Bu değerler artık GitHub Actions ortam değişkenlerinden ve Secrets'tan okunuyor
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 GONDERICI_EMAIL = os.environ.get('GMAIL_KULLANICI_ADI') # Bu, SendGrid'de doğruladığınız adres olmalı
-ALICI_EMAILLERI = ["furkanbalkac@gmail.com"] # Raporu alacak e-posta adresleri
+ALICI_EMAILLERI = ["alici1@example.com", "alici2@example.com"] # Raporu alacak e-posta adresleri
 TICKERS = {
     "Altın Vadeli (Ons/USD)": "GC=F",
     "Nasdaq 100 ETF (QQQ)": "QQQ",
@@ -74,7 +74,8 @@ def email_html_olustur(veriler):
         print(f"HATA: '{SABLON_DOSYASI}' bulunamadı!")
         return None
 
-    match = re.search(r'(.*?)', sablon_icerigi, re.DOTALL)
+    # DÜZELTME 1: Satır şablonunu bulmak için doğru regex kullanıldı.
+    match = re.search(r'<!-- SATIR_SABLONU_BASLANGIC -->(.*?)<!-- SATIR_SABLONU_BITIS -->', sablon_icerigi, re.DOTALL)
     if not match:
         print(f"HATA: '{SABLON_DOSYASI}' içinde satır şablonu bulunamadı.")
         return None
@@ -91,9 +92,20 @@ def email_html_olustur(veriler):
         new_row = row_template.replace('{{ISIM}}', isim).replace('{{FIYAT}}', veri['fiyat']).replace('{{BIRIM}}', birim).replace('{{RENK}}', renk).replace('{{IKON}}', ikon).replace('{{DEGISIM}}', veri['degisim']).replace('{{YUZDE_DEGISIM}}', veri['yuzde_degisim'])
         data_rows += new_row
 
-    final_html = re.sub(r'(.|\n)*?', data_rows, sablon_icerigi)
+    # DÜZELTME 2: Dummy veri bloğunu değiştirmek için doğru regex kullanıldı.
+    final_html = re.sub(
+        r'<!-- VERI_SATIRLARI_BASLANGIC -->(.|\n)*?<!-- VERI_SATIRLARI_BITIS -->',
+        data_rows,
+        sablon_icerigi
+    )
     final_html = final_html.replace('{{TARIH}}', date.today().strftime('%d %B %Y'))
-    final_html = re.sub(r'(.|\n)*?', '', final_html)
+    
+    # DÜZELTME 3: Şablon alanını temizlemek için doğru regex kullanıldı.
+    final_html = re.sub(
+        r'<!-- SABLON_ALANI_BASLANGIC -->(.|\n)*?<!-- SABLON_ALANI_BITIS -->',
+        '',
+        final_html
+    )
     
     print("✓ HTML içeriği oluşturuldu.")
     return final_html

@@ -6,8 +6,8 @@ from datetime import date
 import re # Regular Expression modülünü ekledik
 
 # --- AYARLAR ---
-GMAIL_KULLANICI_ADI = "GMAIL_KULLANICI_ADI"
-GMAIL_UYGULAMA_SIFRESI = "GMAIL_UYGULAMA_SIFRESI"
+GMAIL_KULLANICI_ADI = "furkanbalkac@gmail.com"
+GMAIL_UYGULAMA_SIFRESI = "jfjbmpmqusmdxehj"
 ALICI_EMAILLERI = ["furkanbalkac@gmail.com"]
 TICKERS = {
     "Altın (Ons/USD)": "GC=F",

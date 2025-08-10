@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Günlük Finans Raporu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body style="font-family: 'Inter', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px;">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td align="center">
+                <table width="640" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.07); overflow: hidden;">
+                    <!-- Başlık Bölümü -->
+                    <tr>
+                        <td align="center" style="padding: 30px 20px; background-color: #1e293b; color: #ffffff; border-bottom: 4px solid #3b82f6;">
+                            <h1 style="margin: 0; font-size: 28px; font-weight: 700;">Günlük Piyasa Raporu</h1>
+                            <p style="margin: 5px 0 0; font-size: 16px; color: #cbd5e1;">{{TARIH}}</p>
+                        </td>
+                    </tr>
+                    <!-- İçerik Bölümü -->
+                    <tr>
+                        <td style="padding: 15px 30px 30px;">
+                            <!-- VERI_SATIRLARI_BASLANGIC -->
+                            <!-- Bu bölüm Python tarafından dinamik olarak doldurulacaktır. -->
+                            <!-- Aşağıdaki örnek veriler sadece tasarım önizlemesi içindir. -->
+                            
+                            <!-- Örnek Kart 1 (Artış) -->
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-bottom: 1px solid #e2e8f0;">
+                                <tr>
+                                    <td style="padding: 20px 0 5px;">
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="font-size: 18px; font-weight: 600; color: #334155;">Örnek Varlık (Artış)</td>
+                                                <td style="font-size: 18px; font-weight: 700; color: #1e293b; text-align: right;">2,345.67 USD</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0 0 20px; text-align: right; font-size: 16px; font-weight: 600; color: #16a34a;">
+                                        <span style="margin-right: 5px;">&#9650;</span>+25.10
+                                        <span style="font-size: 14px; color: #64748b; font-weight: 500; margin-left: 5px;">(+1.08%)</span>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Örnek Kart 2 (Azalış) -->
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-bottom: 1px solid #e2e8f0;">
+                                <tr>
+                                    <td style="padding: 20px 0 5px;">
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="font-size: 18px; font-weight: 600; color: #334155;">Örnek Varlık (Azalış)</td>
+                                                <td style="font-size: 18px; font-weight: 700; color: #1e293b; text-align: right;">38.12 TL</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0 0 20px; text-align: right; font-size: 16px; font-weight: 600; color: #dc2626;">
+                                        <span style="margin-right: 5px;">&#9660;</span>-0.45
+                                        <span style="font-size: 14px; color: #64748b; font-weight: 500; margin-left: 5px;">(-1.17%)</span>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- VERI_SATIRLARI_BITIS -->
+                        </td>
+                    </tr>
+                    <!-- Alt Bilgi Bölümü -->
+                    <tr>
+                        <td align="center" style="padding: 20px; font-size: 12px; color: #94a3b8; background-color: #f8fafc;">
+                            <p style="margin: 0;">Bu e-posta Python ile otomatik olarak oluşturulmuştur.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <!-- SABLON_ALANI_BASLANGIC -->
+    <!-- Bu bölüm Python tarafından kullanılır ve nihai e-postadan kaldırılır. -->
+    <div style="display:none;">
+        <!-- SATIR_SABLONU_BASLANGIC -->
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-bottom: 1px solid #e2e8f0;">
+            <tr>
+                <td style="padding: 20px 0 5px;">
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td style="font-size: 18px; font-weight: 600; color: #334155;">{{ISIM}}</td>
+                            <td style="font-size: 18px; font-weight: 700; color: #1e293b; text-align: right;">{{FIYAT}} {{BIRIM}}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 0 0 20px; text-align: right; font-size: 16px; font-weight: 600; color: {{RENK}};">
+                    <span style="margin-right: 5px;">{{IKON}}</span>{{DEGISIM}}
+                    <span style="font-size: 14px; color: #64748b; font-weight: 500; margin-left: 5px;">({{YUZDE_DEGISIM}})</span>
+                </td>
+            </tr>
+        </table>
+        <!-- SATIR_SABLONU_BITIS -->
+    </div>
+    <!-- SABLON_ALANI_BITIS -->
+
+</body>
+</html>
